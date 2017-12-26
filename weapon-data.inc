@@ -1,48 +1,41 @@
-/*==============================================================================
+// built-in include guard removal
+// just in case the user has a local dependency with the same file name
+#if defined _inc_weapon_data
+	#undef _inc_weapon_data
+#endif
+// custom include-guard to ensure we don't duplicate
+#if defined _weapon_data_included
+	#endinput
+#endif
+#define _weapon_data_included
 
-	Southclaw's Advanced Weapon Damage Library
+#include <a_samp>
 
-	With this you can finely tune weapon damage based on distance.
-	Using min/max range values, a weapon's damage varies depending on the
-	distance between the shooter and the target.
-
-	The values below for damage and magsize are NOT real game data values but
-	custom values based on feedback about weapon balancing from the Scavenge
-	and Survive community. All other data is factual.
-
-	Do what you want with it, but keep my name on it :)
-
-==============================================================================*/
-
-
-#define MAX_WEAPONS	 (50)
+#define MAX_WEAPONS (50)
 #define MAX_WEAPON_NAME (15)
 
 
-enum
-{
+enum {
 	WEAPON_VEHICLE_BULLET = WEAPON_PARACHUTE + 1,
 	WEAPON_VEHICLE_EXPLOSIVE,
 	WEAPON_VEHICLE_COLLISION
 }
 
-enum E_WEAPON_DATA
-{
-		weapon_name[MAX_WEAPON_NAME],	// A
-		weapon_model,					// B
-		weapon_magSize,					// C
-		weapon_slot,					// D
-Float:	weapon_minDmg,					// E
-Float:	weapon_maxDmg,					// F
-Float:	weapon_minRange,				// G
-Float:	weapon_maxRange,				// H
-		weapon_shotInterval,			// I
-Float:	weapon_rangeCap					// J
+enum E_WEAPON_DATA {
+	weapon_name[MAX_WEAPON_NAME],	// A
+	weapon_model,					// B
+	weapon_magSize,					// C
+	weapon_slot,					// D
+	Float:weapon_minDmg,			// E
+	Float:weapon_maxDmg,			// F
+	Float:weapon_minRange,			// G
+	Float:weapon_maxRange,			// H
+	weapon_shotInterval,			// I
+	Float:weapon_rangeCap			// J
 }
 
 
-stock const WeaponData[MAX_WEAPONS][E_WEAPON_DATA]=
-{
+stock const WeaponData[MAX_WEAPONS][E_WEAPON_DATA] = {
 //	A					B		C		D		E		F		G		H			I			J
 	{"Fist",			000,	1,		0,		0.1,	1.0,	0.0,	2.0,		0,			1.6},		// 0
 	{"Knuckle Duster",	331,	1,		1,		1.5,	2.0,	0.0,	2.0,		0,			1.6},		// 1
@@ -115,105 +108,151 @@ stock const WeaponData[MAX_WEAPONS][E_WEAPON_DATA]=
 	{"Vehicle",			000,	0,		0,		20.0,	30.0,	0.0,	10.0,		0,			25.0}		// 49 Should be scripted to be based on velocity.
 };
 
-#define GetWeaponName GetWeaponName_New
-stock GetWeaponName_New(weaponid, string[])
-{
-	if(!(0 <= weaponid < MAX_WEAPONS))
+
+// Returns the in-game model for a weapon
+stock GetWeaponModel(weaponid) {
+	if(!(0 <= weaponid < MAX_WEAPONS)) {
 		return 0;
-
-	string[0] = EOS;
-	strcat(string, WeaponData[weaponid][weapon_name], MAX_WEAPON_NAME);
-
-	return 1;
-}
-
-stock GetWeaponModel(weaponid)
-{
-	if(!(0 <= weaponid < MAX_WEAPONS))
-		return 0;
+	}
 
 	return WeaponData[weaponid][weapon_model];
 }
 
-stock GetWeaponMagSize(weaponid)
-{
-	if(!(0 <= weaponid < MAX_WEAPONS))
+// Returns the magazine size for a bullet-based weapon
+stock GetWeaponMagSize(weaponid) {
+	if(!(0 <= weaponid < MAX_WEAPONS)) {
 		return 0;
+	}
 
 	return WeaponData[weaponid][weapon_magSize];
 }
 
-stock GetWeaponSlot(weaponid)
-{
-	if(!(0 <= weaponid < MAX_WEAPONS))
+// Returns the GTA slot for a weapon
+stock GetWeaponSlot(weaponid) {
+	if(!(0 <= weaponid < MAX_WEAPONS)) {
 		return 0;
+	}
 
 	return WeaponData[weaponid][weapon_slot];
 }
 
-stock Float:GetWeaponMinDamage(weaponid)
-{
-	if(!(0 <= weaponid < MAX_WEAPONS))
+// Returns the minimum damage for a weapon
+stock Float:GetWeaponMinDamage(weaponid) {
+	if(!(0 <= weaponid < MAX_WEAPONS)) {
 		return 0.0;
+	}
 
 	return WeaponData[weaponid][weapon_minDmg];
 }
 
-stock Float:GetWeaponMaxDamage(weaponid)
-{
-	if(!(0 <= weaponid < MAX_WEAPONS))
+// Returns the maximum damage for a weapon
+stock Float:GetWeaponMaxDamage(weaponid) {
+	if(!(0 <= weaponid < MAX_WEAPONS)) {
 		return 0.0;
+	}
 
 	return WeaponData[weaponid][weapon_maxDmg];
 }
 
-stock Float:GetWeaponMinRange(weaponid)
-{
-	if(!(0 <= weaponid < MAX_WEAPONS))
+// Sets the minimum damage for a weapon
+stock SetWeaponMinDamage(weaponid, &Float:damage) {
+	if(!(0 <= weaponid < MAX_WEAPONS)) {
+		return 1;
+	}
+
+	WeaponData[weaponid][weapon_minDmg] = damage;
+	return 0;
+}
+
+// Sets the maximum damage for a weapon
+stock SetWeaponMaxDamage(weaponid, &Float:damage) {
+	if(!(0 <= weaponid < MAX_WEAPONS)) {
+		return 1;
+	}
+
+	WeaponData[weaponid][weapon_maxDmg] = damage;
+	return 0;
+}
+
+// Returns the minimum range for a weapon, at this range the weapon deals the maximum damage
+stock Float:GetWeaponMinRange(weaponid) {
+	if(!(0 <= weaponid < MAX_WEAPONS)) {
 		return 0.0;
+	}
 
 	return WeaponData[weaponid][weapon_minRange];
 }
 
-stock Float:GetWeaponMaxRange(weaponid)
-{
-	if(!(0 <= weaponid < MAX_WEAPONS))
+// Returns the maximum range for a weapon, at this range the weapon deals the minimum damage
+stock Float:GetWeaponMaxRange(weaponid) {
+	if(!(0 <= weaponid < MAX_WEAPONS)) {
 		return 0.0;
+	}
 
 	return WeaponData[weaponid][weapon_maxRange];
 }
 
-stock GetWeaponShotInterval(weaponid)
-{
-	if(!(0 <= weaponid < MAX_WEAPONS))
+// Sets the minimum range for a weapon, at this range the weapon deals the maximum damage
+stock SetWeaponMinRange(weaponid, &Float:range) {
+	if(!(0 <= weaponid < MAX_WEAPONS)) {
+		return 1;
+	}
+
+	WeaponData[weaponid][weapon_minRange] = range;
+	return 0;
+}
+
+// Sets the maximum range for a weapon, at this range the weapon deals the minimum damage
+stock SetWeaponMaxRange(weaponid, &Float:range) {
+	if(!(0 <= weaponid < MAX_WEAPONS)) {
+		return 1;
+	}
+
+	WeaponData[weaponid][weapon_maxRange] = range;
+	return 0;
+}
+
+// Returns the interval between shots in milliseconds
+stock GetWeaponShotInterval(weaponid) {
+	if(!(0 <= weaponid < MAX_WEAPONS)) {
 		return 0;
+	}
 
 	return WeaponData[weaponid][weapon_shotInterval];
 }
 
-stock Float:GetWeaponRateOfFire(weaponid)
-{
-	if(!(0 <= weaponid < MAX_WEAPONS))
+// Returns the rate of fire in RPM (Rounds per Minute)
+stock Float:GetWeaponRateOfFire(weaponid) {
+	if(!(0 <= weaponid < MAX_WEAPONS)) {
 		return 0.0;
+	}
 
-	return ((1000 / WeaponData[weaponid][weapon_shotInterval]) * 60); // RPM
+	return ((1000 / WeaponData[weaponid][weapon_shotInterval]) * 60);
 }
 
-stock Float:GetWeaponRangeCap(weaponid)
-{
-	if(!(0 <= weaponid < MAX_WEAPONS))
+// Returns the game-set maximum range that a weapon can hit players at
+stock Float:GetWeaponRangeCap(weaponid) {
+	if(!(0 <= weaponid < MAX_WEAPONS)) {
 		return 0.0;
+	}
 
 	return WeaponData[weaponid][weapon_rangeCap];
 }
 
-stock Float:GetWeaponDamageFromDistance(weaponid, Float:distance)
-{
-	if(distance < WeaponData[weaponid][weapon_minRange])
+// Returns the damage that a weapon should deal at the given distance
+stock Float:GetWeaponDamageFromDistance(weaponid, Float:distance) {
+	if(distance < WeaponData[weaponid][weapon_minRange]) {
 		return WeaponData[weaponid][weapon_maxDmg];
-	
-	if(distance > WeaponData[weaponid][weapon_maxRange])
+	} else if(distance > WeaponData[weaponid][weapon_maxRange]) {
 		return WeaponData[weaponid][weapon_minDmg];
+	}
 
-	return ((WeaponData[weaponid][weapon_minDmg]-WeaponData[weaponid][weapon_maxDmg]) / (WeaponData[weaponid][weapon_maxRange]-WeaponData[weaponid][weapon_minRange])) * (distance - WeaponData[weaponid][weapon_maxRange]) + WeaponData[weaponid][weapon_minDmg];
+	return (
+		(WeaponData[weaponid][weapon_minDmg] -
+			WeaponData[weaponid][weapon_maxDmg]) /
+			(WeaponData[weaponid][weapon_maxRange] -
+				WeaponData[weaponid][weapon_minRange]) *
+			(distance - WeaponData[weaponid][weapon_maxRange]) +
+		WeaponData[weaponid][weapon_minDmg]
+	);
 }
