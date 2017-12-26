@@ -1,4 +1,4 @@
-# The title of your library here, either `library.inc` or `My Cool Library`
+# weapon-data.inc
 
 With this library you can finely tune weapon damage based on distance. Using min/max range values, a weapon's damage varies depending on the distance between the shooter and the target.
 
@@ -20,8 +20,7 @@ Include in your code and begin using the library:
 
 ## Usage
 
-> Write your code documentation or examples here. If your library is documented in the source code, direct users there. If not, list your API and describe it well in this section.
-> If your library is passive and has no API, simply omit this section.
+Check source for documentation, all functions are commented.
 
 ## Testing
 
